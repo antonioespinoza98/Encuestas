@@ -1,4 +1,10 @@
 
+# Marco Antonio
+# Daniel 
+# Genesis
+#Paola 
+# Antonio
+
 library(haven)
 
 base = read_sav("ACTUALIDADES2022_poderacion_estudiantes.sav")
