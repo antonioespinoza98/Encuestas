@@ -7,7 +7,7 @@
 
 library(haven)
 
-base = read_sav("ACTUALIDADES2022_poderacion_estudiantes.sav")
+base = read_sav("ACTUALIDADES2022_ponderacion_estudiantes.sav")
 
 # Cuadro 1 # de lineas por persona 
 table(base$CS10)  
@@ -15,16 +15,20 @@ table(base$CS10)
 
 # Segun la tabla anterior se observaron 18 individuos que no respondieron (999)
 #pero es necesario sabes en qué filas específicas estan 
-which(base$CS10==999)
+library(dplyr)
+
+which(base$CS10 == 999)
 
 #generamos las probabilidades aleatorias
 set.seed(123)
-(aleat = runif(18, min=0 , max=1))
+
+(aleat = runif(18, min = 0 , max = 1))
 
 #Creamos una base sin los 999 para ver la proporción acumulada de lineas telefónicas
 library(dplyr)
-base1=subset(base,base$CS10!=999)
-cumsum(prop.table(table(base1$CS10,base1$Complete)))  
+
+base1 = subset(base,base$CS10 != 999)
+cumsum(prop.table( table(base1$CS10,base1$Complete) ) )  
 # Procedimiento completo en excel, ver cuadro 
 
 
@@ -41,31 +45,34 @@ base[c(13,33,196,264,295,471,828,922,1338,1346,1368,1518,1696,1700,1759,1797,180
 table(base$CS10)
 
 #Creamos el factor de 
-base2$fb = 1/base2$CS10
+base$fb = 1/base$CS10
 
  #Cuadro 3
-summary(base2$fb) 
+summary(base$fb) 
 
 #....................................................................................................
 
 #Paso 2. Ajuste por no respuesta
 library(car)        
-detach(package:dplyr)
-
+library(dplyr)
 #SEXO=CS1, EDAD=CS2, EDUCACION=CS3
 
 #Obtenemos la persona con edad más avanzada para realizar la recodificación
-mayor=subset(base,base$CS2!=999) 
-max(mayor$CS2)
+base %>% 
+      filter(CS2 != 999) %>%
+      summarise(
+            edad_max = max(CS2)
+      )
+
 
 #volvemos nivel de educacion numerica
-base$CS3=as.numeric(base$CS3)
+base$CS3 = as.numeric(base$CS3)
 
 #recodificamos la variable nivel de educacion
-base$educa=recode(base$CS3,"1:2='Primaria';3:4='Secundaria';5:6='Universitaria'")
+base$educa = car::recode(base$CS3,"1:2='Primaria';3:4='Secundaria';5:6='Universitaria'")
 
 #recodificamos la variable edad
-base$edad=recode(base$CS2,"18:29 ='18-29';30:49='30-49';50:89='50 o mas'")
+base$edad = car::recode(base$CS2,"18:29 ='18-29';30:49='30-49';50:89='50 o mas'")
 
 
 ####Creamos tabla con valores NA para cada uno de los sexos. El cuadro se realiza en excel
