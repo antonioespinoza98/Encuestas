@@ -13,7 +13,7 @@
 library(haven)
 library(dplyr)
 library(survey)
-
+library(car)   
 
 base = read_sav("ACTUALIDADES2022_ponderacion_estudiantes.sav")
 
@@ -67,7 +67,6 @@ summary(base$fb)
 #....................................................................................................
 
 #Paso 2. Ajuste por no respuesta
-library(car)        
 
 
 #SEXO=CS1, EDAD=CS2, EDUCACION=CS3
@@ -84,10 +83,10 @@ base$CS3=as.numeric(base$CS3)
 
 #recodificamos la variable nivel de educacion
 
-base$educa = car::recode(base$CS3,"1:2='Primaria';3:4='Secundaria';5:6='Universitaria'")
+base$educa = car::recode(base$CS3,"1:2='Primaria';3:4='Secundaria';5:6='Universitaria'; 9 = 'NA'")
 
 #recodificamos la variable edad
-base$edad = car::recode(base$CS2,"18:29 ='18-29';30:49='30-49';50:89='50 o mas'")
+base$edad = car::recode(base$CS2,"18:29 ='18-29';30:49='30-49';50:89='50+'")
 
 
 ####Creamos tabla con valores NA para cada uno de los sexos. El cuadro se realiza en excel
@@ -97,6 +96,7 @@ table(base$edad,base$educa,base$CS1)
 #................................................................................................
 
 #Para el cuadro 5 se deben de imputar los valores faltantes 
+
 
 table(base$CS3)  
 # Presentamos 16 valores con NAS en el nivel educativo 
@@ -118,7 +118,7 @@ base2 %>%
        )
 
 #distribucion marginal
-cumsum(prop.table(table(base2$CS3)))  #debería ser con educa no?
+cumsum(prop.table(table(base2$educa)))  #debería ser con educa no?
 
 #numeros aleatorios
 set.seed(123)
@@ -135,10 +135,11 @@ which(colnames(base) == "CS3")
 base[c(815,1156,1264,1338,1498,1501,1508,1696,1700,1759,1768,1772,1779,1789,1797,1800), 
       132] <- c(3,6,4,6,6,1,4,6,5,4,6,4,6,5,2,6)
 
-(asegurar1= base[c(815,1156,1264,1338,1498,1501,1508,1696,1700,1759,1768,1772,1779,1789,1797,1800), 
-                 132])
+base[c(815,1156,1264,1338,1498,1501,1508,1696,1700,1759,1768,1772,1779,1789,1797,1800), 
+                 132]
 
-#Valores del nivel educativo imputados
+#Valores del nivel educativo imputados, en base están
+
 table(base$CS3) 
 #Continuamos con los valores de la edad
 
@@ -156,8 +157,6 @@ cumsum(prop.table(table(base3$edad)))
 set.seed(123)
 (aleat = runif(19, min=0 , max=1))
 
-#el resto está en excel?
-
 #CAMBIAMOS LOS 999 POR LOS IMPUTADOS
 #en qué filas específica está
 which(base$CS2==999)
@@ -168,15 +167,17 @@ which(colnames(base)=="CS2")
 base[c(196,391,662,767,922,1100,1338,1346,1477,1492,1525,1696,1700,1759,1768,1779,1781,1797,1800), 
       131] <- c(30,50,30,50,50,18,30,50,30,30,50,30,30,30,18,50,18,30,30)
 
-(asegurar3= base[c(196,391,662,767,922,1100,1338,1346,1477,1492,1525,1696,1700,1759,1768,1779,1781,1797,1800), 
-                 131])
+base[c(196,391,662,767,922,1100,1338,1346,1477,1492,1525,1696,1700,1759,1768,1779,1781,1797,1800), 131]
 
 #Valores de edad imputados
 table(base$CS2) 
 base$edad=recode(base$CS2,"18:29 ='18-29';30:49='30-49';50:89='50 o mas'") # volvemos a recodificar debido a la imputación
 base$educa=recode(base$CS3,"1:2='Primaria';3:4='Secundaria';5:6='Universitaria'")
+
+table(base$edad, base$educa, base$CS1)
 #.........................................................................................
 
+# Cuadros 6 y 7
 #CON LA ENCUESTA DE LA ENAHO
 
 ENAHO2021 = read_sav("ENAHO 2021.sav")
@@ -216,14 +217,17 @@ table(ENAHO2021$educaE)
 #Hay 7 valores faltantes en educacion
 
 #Buscamos la posición de los valores faltantes
-ENAHO2021[ENAHO2021$educaE==99,1:5]
 
+which(colnames(ENAHO2021)=="educaE") 
+
+ENAHO2021[ENAHO2021$educaE==99, 600]
 
 #numeros aleatorios para la educacion
 set.seed(123)
 (aleat.ed = runif(7, min=0 , max=1))
 
 #Sustituir los valores
+baseE2 = as.data.frame(read_sav("ENAHO 2021.sav"))
 
 baseE2$A5=as.numeric(baseE2$A5)
 baseE2$NivInst=as.numeric(baseE2$NivInst)
@@ -241,6 +245,7 @@ baseE2$edadE=as.factor(recode(baseE2$A5,"18:29 ='18-29';30:49='30-49';50:97='50 
 diseno2<-svydesign(ids=~1, data=baseE2, weight=~FACTOR)
 
 #Tablas con valores asignados por el factor
+
 B=svytable(~educaE+edadE+A4,design=diseno2)
 B
 
@@ -252,7 +257,7 @@ B/sum(B)
 #Ahora se debe deben de incluir los pesos conforme la edad y el nivel de educación 
 #Se utiliza la última base creada de la encuesta de actualidades
 base$edd.ed.s=paste(base$edad,"-",base$educa,"-",base$CS1)
-library(dplyr)
+
 
 base$fnr=ifelse(base$edd.ed.s=="18-29 - Primaria - 1",3.99717918,
               ifelse(base$edd.ed.s=="30-49 - Primaria - 1",1.906555126,
@@ -272,11 +277,40 @@ base$fnr=ifelse(base$edd.ed.s=="18-29 - Primaria - 1",3.99717918,
                                                                                                                 ifelse(base$edd.ed.s=="18-29 - Universitaria - 2",0.53377378,
                                                                                                                        ifelse(base$edd.ed.s=="30-49 - Universitaria - 2",0.512632706,
                                                                                                                               0.71766584)))))))))))))))))
+
 sort(table(base$fnr,base$Complete))
 sort(table(base$edd.ed.s,base$Complete))  #Note que todos los valores están asignados
 
 base$factor=base$fb*base$fnr
 
-summary(base$factor)   #Cuadro 8 
+round(summary(base$factor), 2)   #Cuadro 8 
+
+# ----------------------------
+# Comparaciones
+
+table(base$edad, base$educa, base$CS1)
+
+diseno1 <- svydesign(ids=~1, data=base, weight=~factor)
+(tablaPond = svytable( ~ edad + educa + CS1, design=diseno1))
+
+round(tablaPond, 0)
+
+table(ENAHO2021$edadE, ENAHO2021$educaE, ENAHO2021$A4)
+
+# ----------------------------
 
 
+diseno_mia = svydesign(ids = ~1, data = base, weights = ~1)
+base$JL2 = factor(base$JL2)
+svymean(~JL2, diseno_mia)
+# 52 de cada 100 personas se pasarían a las jornadas 4x3
+table(base$JL2)
+# Su error estándar es de 0.03
+confint(svymean(~JL2, design = diseno_mia))
+
+
+
+diseno_mia1 = svydesign(ids = ~1, data = base, weights = ~factor)
+
+svymean(~JL2, diseno_mia1)
+confint(svymean(~JL2, design = diseno_mia1))
