@@ -19,7 +19,7 @@ library(htmlwidgets)
 
 ```{r}
 base = data.frame(read_sav('ACTUALIDADES2022_raw.sav'))
-
+#Cambiar la base utilizada por la que viene en el examen
 base1 = base
 
 #si trabajó o estudió de forma remota
@@ -50,15 +50,21 @@ tabla_segun_nvl[3, ]/sum(tabla_segun_nvl[3, ]) ),  ncol = 5, nrow = 3, byrow = T
 dimnames =  list(  "Nivel_educativo" = c("Primaria", "Secundaria", "Universidad"),
 "Nivel" = c("De acuerdo", "En desacuerdo", "Muy de acuerdo", "Muy en desacuerdo", 
 "Ni de acuerdo ni en desacuerdo")   )  ) 
-
+#Ligeras Modificaciones en las proporciones debido a la base del examen 
 base_virtu = data.frame(   nivel.educativo = c('Primaria', 'Secundaria', 'Universidad'),
- muy.en.desacuerdo = c(0.06071429,0.03576538,0.02683781),
- en.desacuerdo = c(0.2142857,0.2217454,0.1155193),
- ni.de.acuerdo.ni.en.desacuerdo = c(0.08214286,0.07725322,0.07117853),
- de.acuerdo = c(0.5178571,0.4763948,0.4539090), 
- muy.de.acuerdo = c(0.1250000,0.1888412,0.3325554))
+ muy.en.desacuerdo = c(0.05734767,0.03576538,0.02715466),
+ en.desacuerdo = c(0.2150538,0.2217454,0.1168831),
+ ni.de.acuerdo.ni.en.desacuerdo = c(0.08243728,0.07725322,0.07201889),
+ de.acuerdo = c(0.5197133,0.4763948,0.4521842), 
+ muy.de.acuerdo = c(0.1254480,0.1888412,0.3317591))
 
 
+base_virtu=base_virtu %>% 
+  rename("Muy en desacuerdo "= muy.en.desacuerdo,
+         "En desacuerdo" = en.desacuerdo,
+         "Ni de acuerdo ni en desacuerdo" = ni.de.acuerdo.ni.en.desacuerdo,
+         "De acuerdo" = de.acuerdo,
+         "Muy de acuerdo" = muy.de.acuerdo)
 likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu, ylab = "Nivel Educativo", xlab = "", main = "" )
 ```
 
@@ -88,14 +94,15 @@ dimnames =  list(  "Nivel_educativo" = c("Primaria", "Secundaria", "Universidad"
 "Nivel" = c("De acuerdo", "En desacuerdo", "Muy de acuerdo", "Muy en desacuerdo", 
 "Ni de acuerdo ni en desacuerdo")   )  ) 
 
+#Como utilizamos la nueva base las proporciones cambian ligeramente
 base_virtu = data.frame(   nivel.educativo = c('Primaria', 'Secundaria', 'Universidad'),
- muy.en.desacuerdo = c(0.13732394, 0.12322946, 0.09929907),
+ muy.en.desacuerdo = c(0.13427562, 0.12322946, 0.09810875),
  en.desacuerdo = c( 0.4190141,0.3626062,0.2803738),
- ni.de.acuerdo.ni.en.desacuerdo = c(0.07746479, 0.06515581, 0.08177570),
- de.acuerdo = c(  0.2887324, 0.3201133, 0.3820093), 
- muy.de.acuerdo = c(0.07746479, 0.12889518, 0.15654206))
+ ni.de.acuerdo.ni.en.desacuerdo = c(0.07773852, 0.06515581, 0.08037825),
+ de.acuerdo = c(  0.2897527, 0.3201133, 0.3829787), 
+ muy.de.acuerdo = c(0.07773852, 0.12889518, 0.15602837))
 
-
+ 
 likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu, xlab = "", ylab = "Nivel Educativo", main = "")
 ```
 
