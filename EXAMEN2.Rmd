@@ -37,7 +37,7 @@ base1$CS3=factor(base1$CS3)
 base1 = base1 %>% 
   dplyr::select(VIR3, CS3) %>%
   dplyr::filter(CS3 != 9 & VIR3 != 9) %>%
-  mutate(CS3 = car::recode(CS3, "1:2 = 'primaria'; 3:4 = 'secundaria'; 5:6 = 'universitaria' ")) %>%
+  mutate(CS3 = car::recode(CS3, "1:2 = 'Primaria'; 3:4 = 'Secundaria'; 5:6 = 'Universitaria' ")) %>%
   mutate(VIR3 = car::recode(VIR3, "1 = 'Muy en desacuerdo'; 2 = 'En  desacuerdo'; 3 = 'Ni de acuerdo ni en desacuerdo';
   4 =  'De acuerdo'; 5 = 'Muy de acuerdo' "))
 
@@ -51,7 +51,7 @@ dimnames =  list(  "Nivel_educativo" = c("Primaria", "Secundaria", "Universidad"
 "Nivel" = c("De acuerdo", "En desacuerdo", "Muy de acuerdo", "Muy en desacuerdo", 
 "Ni de acuerdo ni en desacuerdo")   )  ) 
 
-base_virtu = data.frame(   nivel.educativo = c('primaria', 'secundaria', 'universidad'),
+base_virtu = data.frame(   nivel.educativo = c('Primaria', 'Secundaria', 'Universidad'),
  muy.en.desacuerdo = c(0.06071429,0.03576538,0.02683781),
  en.desacuerdo = c(0.2142857,0.2217454,0.1155193),
  ni.de.acuerdo.ni.en.desacuerdo = c(0.08214286,0.07725322,0.07117853),
@@ -59,7 +59,7 @@ base_virtu = data.frame(   nivel.educativo = c('primaria', 'secundaria', 'univer
  muy.de.acuerdo = c(0.1250000,0.1888412,0.3325554))
 
 
-likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu)
+likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu, ylab = "Nivel Educativo", xlab = "", main = "" )
 ```
 
 ### Gráfico de Likert para estudio según nivel educativo
@@ -88,7 +88,7 @@ dimnames =  list(  "Nivel_educativo" = c("Primaria", "Secundaria", "Universidad"
 "Nivel" = c("De acuerdo", "En desacuerdo", "Muy de acuerdo", "Muy en desacuerdo", 
 "Ni de acuerdo ni en desacuerdo")   )  ) 
 
-base_virtu = data.frame(   nivel.educativo = c('primaria', 'secundaria', 'universidad'),
+base_virtu = data.frame(   nivel.educativo = c('Primaria', 'Secundaria', 'Universidad'),
  muy.en.desacuerdo = c(0.13732394, 0.12322946, 0.09929907),
  en.desacuerdo = c( 0.4190141,0.3626062,0.2803738),
  ni.de.acuerdo.ni.en.desacuerdo = c(0.07746479, 0.06515581, 0.08177570),
@@ -96,10 +96,10 @@ base_virtu = data.frame(   nivel.educativo = c('primaria', 'secundaria', 'univer
  muy.de.acuerdo = c(0.07746479, 0.12889518, 0.15654206))
 
 
-likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu)
+likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu, xlab = "", ylab = "Nivel Educativo", main = "")
 ```
 
-### Televisor Sankey
+### Gráfico Sankey
 
 ```{r}
 base1 = base
@@ -108,10 +108,10 @@ base1$VIR2=factor(base1$VIR2)
 base1$CS1 = factor(base1$CS1)
 
 #manual
-base1 = base1[ ,c(34,35)]
-base1 = subset(base1, VIR1 != 4)
-base1$VIR1 = car::recode(base1$VIR1, " 1 = 'trabajar'; 2 = 'estudiar'; 3 = 'trabajar.estudiar'; 9 = 'NS/NR' ")
-base1$VIR2 = car::recode(base1$VIR2, " 1 = 'trabajar'; 2 = 'estudiar'; 3 = 'trabajar.estudiar'; 4 = 'No retorna';  9 = 'NS/NR' ")
+# base1 = base1[ ,c(34,35)]
+# base1 = subset(base1, VIR1 != 4)
+# base1$VIR1 = car::recode(base1$VIR1, " 1 = 'trabajar'; 2 = 'estudiar'; 3 = 'trabajar.estudiar'; 9 = 'NS/NR' ")
+# base1$VIR2 = car::recode(base1$VIR2, " 1 = 'trabajar'; 2 = 'estudiar'; 3 = 'trabajar.estudiar'; 4 = 'No retorna';  9 = 'NS/NR' ")
 
 
 base1 = base1 %>%
@@ -120,18 +120,21 @@ base1 = base1 %>%
   dplyr::mutate(VIR1 = car::recode(VIR1, " 1 = 'trabajar'; 2 = 'estudiar'; 3 = 'Trabajar.estudiar'; 9 = 'NS/NR' ")) %>%
   dplyr::mutate(VIR2 = car::recode(VIR2, " 1 = 'Trabajar'; 2 = 'Estudiar'; 3 = 'trabajar.estudiar'; 4 = 'No retorna';  9 = 'ns/nr' "))
 
-head(base1)
 
 ```
 
 ```{r}
-hchart(  data_to_sankey(base1), "sankey", name = "Lonnis" )
+hchart(  data_to_sankey(base1), "sankey", name = "Personas que trabajaron remoto y retomaron o no sus actividades presencial",
+nodes = list( list(id = 'Estudiar',
+                    id = 'NS/NR',
+                    id = 'Trabajar',
+                    id = ' Trabajar y Estudiar',
+                    id = 'Estudiar',
+                    id = 'No retorna',
+                    id = 'NS/NR',
+                    id = 'Trabajar',
+                    id = 'Trabar y estudiar') ) )
 
-htmlwidgets::savewidget(widget = pl, file = "map.html")
-
-webshot::webshot(url = "map.html", file = "mapa.png")
-
-table(base1$VIR1, base1$VIR2) 
 ```
 
 
