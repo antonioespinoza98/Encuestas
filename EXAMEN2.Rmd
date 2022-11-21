@@ -16,12 +16,11 @@ library(highcharter)
 library(htmlwidgets)
 ```
 
-
+#Base del examen
 ```{r}
-base = data.frame(read_sav('ACTUALIDADES2022_raw.sav'))
-#Cambiar la base utilizada por la que viene en el examen
+ACTUALIDADES2022_examenII <- read_dta("Documents/Encuestas/ACTUALIDADES2022_examenII.dta")
+base=ACTUALIDADES2022_examenII
 base1 = base
-
 #si trabajó o estudió de forma remota
 base1$VIR1=as.numeric(base1$VIR1)
 ```
@@ -33,24 +32,19 @@ base1$VIR1=as.numeric(base1$VIR1)
 base1$VIR3=factor(base1$VIR3)
 # Nvl. Educativo
 base1$CS3=factor(base1$CS3)
-
 base1 = base1 %>% 
   dplyr::select(VIR3, CS3) %>%
   dplyr::filter(CS3 != 9 & VIR3 != 9) %>%
   mutate(CS3 = car::recode(CS3, "1:2 = 'Primaria'; 3:4 = 'Secundaria'; 5:6 = 'Universitaria' ")) %>%
   mutate(VIR3 = car::recode(VIR3, "1 = 'Muy en desacuerdo'; 2 = 'En  desacuerdo'; 3 = 'Ni de acuerdo ni en desacuerdo';
   4 =  'De acuerdo'; 5 = 'Muy de acuerdo' "))
-
-
 tabla_segun_nvl = table(base1$CS3, base1$VIR3)
-
 # Proporción de personas de que tan de acuerdo o en desacuerdo están con que se mantenga la virtualidad en el sector laboral, según nivel educativo
 prop_matrix =   matrix(c(tabla_segun_nvl[1, ]/sum(tabla_segun_nvl[1, ]), tabla_segun_nvl[2, ]/sum(tabla_segun_nvl[2, ]),
 tabla_segun_nvl[3, ]/sum(tabla_segun_nvl[3, ]) ),  ncol = 5, nrow = 3, byrow = TRUE,
 dimnames =  list(  "Nivel_educativo" = c("Primaria", "Secundaria", "Universidad"),
 "Nivel" = c("De acuerdo", "En desacuerdo", "Muy de acuerdo", "Muy en desacuerdo", 
 "Ni de acuerdo ni en desacuerdo")   )  ) 
-#Ligeras Modificaciones en las proporciones debido a la base del examen 
 base_virtu = data.frame(   nivel.educativo = c('Primaria', 'Secundaria', 'Universidad'),
  muy.en.desacuerdo = c(0.05734767,0.03576538,0.02715466),
  en.desacuerdo = c(0.2150538,0.2217454,0.1168831),
@@ -58,14 +52,15 @@ base_virtu = data.frame(   nivel.educativo = c('Primaria', 'Secundaria', 'Univer
  de.acuerdo = c(0.5197133,0.4763948,0.4521842), 
  muy.de.acuerdo = c(0.1254480,0.1888412,0.3317591))
 
-
+table()
 base_virtu=base_virtu %>% 
   rename("Muy en desacuerdo "= muy.en.desacuerdo,
          "En desacuerdo" = en.desacuerdo,
          "Ni de acuerdo ni en desacuerdo" = ni.de.acuerdo.ni.en.desacuerdo,
          "De acuerdo" = de.acuerdo,
          "Muy de acuerdo" = muy.de.acuerdo)
-likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu, ylab = "Nivel Educativo", xlab = "", main = "" )
+
+likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu, ylab = "Nivel Educativo", xlab = "",main="",legend.position = "right")
 ```
 
 ### Gráfico de Likert para estudio según nivel educativo
@@ -76,25 +71,19 @@ base1 = base
 base1$VIR6=factor(base1$VIR6)
 # Nvl. Educativo
 base1$CS3=factor(base1$CS3)
-
 base1 = base1 %>% 
   dplyr::select(VIR6, CS3) %>%
   dplyr::filter(CS3 != 9 & VIR6 != 9) %>%
   mutate(CS3 = car::recode(CS3, "1:2 = 'primaria'; 3:4 = 'secundaria'; 5:6 = 'universitaria' ")) %>%
   mutate(VIR6 = car::recode(VIR6, "1 = 'Muy en desacuerdo'; 2 = 'En  desacuerdo'; 3 = 'Ni de acuerdo ni en desacuerdo';
   4 =  'De acuerdo'; 5 = 'Muy de acuerdo' "))
-
-
 tabla_segun_nvl = table(base1$CS3, base1$VIR6)
-
 # Proporción de personas de que tan de acuerdo o en desacuerdo están con que se mantenga la virtualidad en el sector laboral, según nivel educativo
 prop_matrix =   matrix(c(tabla_segun_nvl[1, ]/sum(tabla_segun_nvl[1, ]), tabla_segun_nvl[2, ]/sum(tabla_segun_nvl[2, ]),
 tabla_segun_nvl[3, ]/sum(tabla_segun_nvl[3, ]) ),  ncol = 5, nrow = 3, byrow = TRUE,
 dimnames =  list(  "Nivel_educativo" = c("Primaria", "Secundaria", "Universidad"),
 "Nivel" = c("De acuerdo", "En desacuerdo", "Muy de acuerdo", "Muy en desacuerdo", 
 "Ni de acuerdo ni en desacuerdo")   )  ) 
-
-#Como utilizamos la nueva base las proporciones cambian ligeramente
 base_virtu = data.frame(   nivel.educativo = c('Primaria', 'Secundaria', 'Universidad'),
  muy.en.desacuerdo = c(0.13427562, 0.12322946, 0.09810875),
  en.desacuerdo = c( 0.4190141,0.3626062,0.2803738),
@@ -102,7 +91,12 @@ base_virtu = data.frame(   nivel.educativo = c('Primaria', 'Secundaria', 'Univer
  de.acuerdo = c(  0.2897527, 0.3201133, 0.3829787), 
  muy.de.acuerdo = c(0.07773852, 0.12889518, 0.15602837))
 
- 
+base_virtu=base_virtu %>% 
+  rename("Muy en desacuerdo "= muy.en.desacuerdo,
+         "En desacuerdo" = en.desacuerdo,
+         "Ni de acuerdo ni en desacuerdo" = ni.de.acuerdo.ni.en.desacuerdo,
+         "De acuerdo" = de.acuerdo,
+         "Muy de acuerdo" = muy.de.acuerdo)
 likert(nivel.educativo ~.,  ReferenceZero = 3, data = base_virtu, xlab = "", ylab = "Nivel Educativo", main = "")
 ```
 
@@ -113,106 +107,31 @@ base1 = base
 base1$VIR1 = factor(base1$VIR1)
 base1$VIR2=factor(base1$VIR2)
 base1$CS1 = factor(base1$CS1)
-
 #manual
 # base1 = base1[ ,c(34,35)]
 # base1 = subset(base1, VIR1 != 4)
 # base1$VIR1 = car::recode(base1$VIR1, " 1 = 'trabajar'; 2 = 'estudiar'; 3 = 'trabajar.estudiar'; 9 = 'NS/NR' ")
 # base1$VIR2 = car::recode(base1$VIR2, " 1 = 'trabajar'; 2 = 'estudiar'; 3 = 'trabajar.estudiar'; 4 = 'No retorna';  9 = 'NS/NR' ")
-
-
 base1 = base1 %>%
   dplyr::select(VIR1,VIR2) %>%
   dplyr::filter(VIR1 != 4) %>%
-  dplyr::mutate(VIR1 = car::recode(VIR1, " 1 = 'trabajar'; 2 = 'estudiar'; 3 = 'Trabajar.estudiar'; 9 = 'NS/NR' ")) %>%
-  dplyr::mutate(VIR2 = car::recode(VIR2, " 1 = 'Trabajar'; 2 = 'Estudiar'; 3 = 'trabajar.estudiar'; 4 = 'No retorna';  9 = 'ns/nr' "))
-
-
+  dplyr::mutate(VIR1 = car::recode(VIR1, " 1 = 'Trabajar'; 2 = 'Estudiar'; 3 = 'Trabajar y Estudiar'; 9 = 'NS/NR' ")) %>%
+  dplyr::mutate(VIR2 = car::recode(VIR2, " 1 = 'Trabajar '; 2 = 'Estudiar '; 3 = 'Trabajar y Estudiar '; 4 = 'No retorna ';  9 = 'NS/NR ' "))
 ```
 
+#Ajuste de colores
 ```{r}
 hchart(  data_to_sankey(base1), "sankey", name = "Personas que trabajaron remoto y retomaron o no sus actividades presencial",
-nodes = list( list(id = 'Estudiar',
-                    id = 'NS/NR',
-                    id = 'Trabajar',
-                    id = ' Trabajar y Estudiar',
-                    id = 'Estudiar',
-                    id = 'No retorna',
-                    id = 'NS/NR',
-                    id = 'Trabajar',
-                    id = 'Trabar y estudiar') ) )
+nodes = list( list(id = 'Estudiar',color="lightblue"),
+                   list(id = 'Estudiar ', color="lightblue"),
+                    list(id = 'NS/NR',color="white"), 
+                    list(id = 'Trabajar', color="cyan"),
+                    list(id='Trabajar ',color="cyan"),
+                    list(id ='Trabajar y Estudiar',color="orange"),
+                    list(id = 'Trabajar y Estudiar ',color="orange"),
+                    list(id = 'No retorna ',color="grey"),
+                    list(id = 'NS/NR'),
+                    list(id = 'Trabajar')
+                     ))
 
 ```
-
-
-
-
-
-#Gráfico 100 % VIR3  y VRI6. Muy de acuerdo, de acuerdo...
-#cambiar al sexo por la labor que realiza 
-```{r}
-
-base %>% ggplot(aes(x=CS3,y=prueba,fill=VIR3))+ geom_bar(position = "stack",stat = "identity")+coord_flip()
-  base$VIR3prueba=(base$VIR3/1884)*100
-table(base$VIR3)/1884
-summary(base$VIR3prueba)
-sum(base$VIR3)
-#Valores de la tabla con probabilidad individual 
-0.03450106/65
-0.16719745/315
-0.07377919/139
-0.46549894/877
-0.24150743/455
-0.01751592/33
-
-base1 = base1 %>% 
-  mutate(prueba=case_when((VIR3==1& CS1 == 1)~0.001066098,
-          (VIR3==2 & CS1 == 1) ~ 0.001066098,
-          (VIR3==3 & CS1 ==1)~ 0.001066098,
-          (VIR3==4 & CS1 == 1)~  0.001066098 ,
-          (VIR3==5 & CS1 == 1)~ 0.001066098,
-          (VIR3==9 & CS1 == 1)~ 0.001066098,
-          (VIR3==1& CS1 == 2)~ 0.001057082,
-          (VIR3==2 & CS1 == 2) ~  0.001057082,
-          (VIR3==3 & CS1 ==2)~  0.001057082,
-          (VIR3==4 & CS1 == 2)~   0.001057082 ,
-          (VIR3==5 & CS1 == 2)~  0.001057082,
-          (VIR3==9 & CS1 == 2)~  0.001057082,
-          
-          ))
-
-table(base$VIR3,base$CS1)/938
-table(base$VIR3,base$CS1)/946
-```
-
-
-#Divisiones según sexo 
-```{r}
-base_sexo=base %>% 
-  group_by(VIR3) %>%
-    filter(CS1==1) %>% 
-      summarise(
-        n = n(),
-        prop =unique(n)/938
-      )
-table(base$VIR3,base$CS1)/938
-base_sexo2=base %>% 
-  group_by(VIR3) %>%
-    filter(CS1==2) %>% 
-      summarise(
-        n = n(),
-        prop =unique(n)/946
-      )
-table(base$VIR3,base$CS1)/946
-```
-
-```{r}
-summarise( )
-base %>% filter(CS1==1) %>% summarise(
-  suma=sum(prueba,na.rm = T)
-)
-sum(base$prueba,na.rm = T)
-```
-
-
-
